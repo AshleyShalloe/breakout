@@ -75,28 +75,24 @@ function moveBall(ballElement){
     // move the ball in the direction ballAngleDeg
     var ballLeft = parseFloat(ballElement.style.left.replace("%", ""))
     var ballBottom = parseFloat(ballElement.style.bottom.replace("%", ""))
-    if (moveDistance > 0){
-        if (ballLeft >= 100){
-          moveDistance = -5
-          ballAngleDeg = ballAngleDeg * -1
-        }
-        else if (ballBottom >= 100){
-          moveDistance = -5
-          ballAngleDeg = ballAngleDeg * -1
-        }
+    if (ballLeft >= 100){
+        moveDistanceX = -5
+        // ballAngleDeg = ballAngleDeg * -1
     }
-    else if (moveDistance < 0){
-        if (ballLeft <= 0){
-          moveDistance = 5
-          ballAngleDeg = ballAngleDeg * -1
-        }
-        else if (ballBottom <= 0){
-          moveDistance = 5
-          ballAngleDeg = ballAngleDeg * -1
-        }
+    if (ballBottom >= 100){
+        moveDistanceY = -5
+        // ballAngleDeg = ballAngleDeg * -1
     }
-    var xComponent = Math.cos(ballAngleDeg * Math.PI / 180) * moveDistance
-    var yComponent = Math.sin(ballAngleDeg * Math.PI / 180) * moveDistance
+    if (ballLeft <= 0){
+        moveDistanceX = 5
+        // ballAngleDeg = ballAngleDeg * -1
+    }
+    if (ballBottom <= 0){
+        moveDistanceY = 5
+        // ballAngleDeg = ballAngleDeg * -1
+    }
+    var xComponent = Math.cos(ballAngleDeg * Math.PI / 180) * moveDistanceX
+    var yComponent = Math.sin(ballAngleDeg * Math.PI / 180) * moveDistanceY
     
     ballElement.style.left = (ballLeft + xComponent).toString() + "%"
     ballElement.style.bottom = (ballBottom + yComponent).toString() + "%"
@@ -117,7 +113,8 @@ function init(){
 
 // globals
 var ballAngleDeg = 45
-var moveDistance = 1 // distance for ball to move in percent
+var moveDistanceX = 0.5 // distance for ball to move in percent
+var moveDistanceY = 0.5 
 
 init();
 
