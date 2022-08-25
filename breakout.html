@@ -63,6 +63,24 @@ function initPlayfield(){
     document.getElementById("brickContainer").innerHTML = rowHtml
 }
 
+function updateBricks(){
+    `Update the bricks on the playfield to match the state of brickArray`
+    for (var i=0; i<brickArray.length; i++){
+        for (var j=0; j<brickArray[i].length; j++){
+            if (brickArray[i][j] == 0){
+                if (document.getElementsByClassName("brickRow")[i].getElementsByClassName("brick")[j].classList.contains("active")){
+                    document.getElementsByClassName("brickRow")[i].getElementsByClassName("brick")[j].classList.remove("active")
+                }
+            }
+            else if (brickArray[i][j] == 1){
+                if (!document.getElementsByClassName("brickRow")[i].getElementsByClassName("brick")[j].classList.contains("active")){
+                    document.getElementsByClassName("brickRow")[i].getElementsByClassName("brick")[j].classList.add("active")
+                }
+            }
+        }
+    }
+}
+
 function initBall(){
     var ballHtml = "<div class='ball' style='left: 50%; bottom: 10%;'></div>"
     document.getElementById("playfieldContainer").innerHTML += ballHtml
