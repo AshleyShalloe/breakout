@@ -130,6 +130,8 @@ function checkBrickCollisions(ballElement){
     var ballLeft = ballOffsets.left;
     var ballRight = ballOffsets.right;
     var ballBottom = ballOffsets.bottom;
+    var ballX = ballOffsets.x;
+    var ballY = ballOffsets.y;
     
     for (var i=0; i<document.getElementsByClassName("brick").length; i++){
         if (document.getElementsByClassName("brick")[i].classList.contains("active")){
@@ -141,6 +143,30 @@ function checkBrickCollisions(ballElement){
 
             if ((ballLeft >= left) && (ballRight <= right) && (ballTop >= top) && (ballBottom <= bottom)){
                 document.getElementsByClassName("brick")[i].classList.remove("active")
+
+                // figure out which side is closest to the ball
+                // then assume that is the side we hit first
+                // and rebound off it
+                var topDelta = Math.abs(ballTop - top)
+                var leftDelta = Math.abs(ballLeft - left)
+                var rightDelta = Math.abs(ballRight - right)
+                var bottomDelta = Math.abs(ballBottom - bottom)
+
+                var minDelta = Math.min(topDelta, leftDelta, rightDelta, bottomDelta)
+                console.log(topDelta, leftDelta, rightDelta, bottomDelta)
+
+                if (topDelta == minDelta){
+                    changeDirectionIfCollide("top")
+                }
+                if (leftDelta == minDelta){
+                    changeDirectionIfCollide("left")
+                }
+                if (rightDelta == minDelta){
+                    changeDirectionIfCollide("right")
+                }
+                if (bottomDelta == minDelta){
+                    changeDirectionIfCollide("bottom")
+                }
             }
         }
     }
@@ -148,19 +174,16 @@ function checkBrickCollisions(ballElement){
 
 function changeDirectionIfCollide(plane){
     if (plane == "top"){
-        moveDistanceX = -0.5
+        moveDistanceY = 0.5
     }
-
     else if (plane == "bottom"){
         moveDistanceY = -0.5
     }
-
     else if (plane == "left"){
-        moveDistanceX = 0.5
+        moveDistanceX = -0.5
     }
-    
     else if (plane == "right"){
-        moveDistanceY = 0.5
+        moveDistanceX = 0.5
     }
 }
 
