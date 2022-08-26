@@ -94,19 +94,19 @@ function moveBall(ballElement){
     var ballLeft = parseFloat(ballElement.style.left.replace("%", ""))
     var ballBottom = parseFloat(ballElement.style.bottom.replace("%", ""))
     if (ballLeft >= 100){
-        moveDistanceX = -5
+        moveDistanceX = -0.5
         // ballAngleDeg = ballAngleDeg * -1
     }
     if (ballBottom >= 100){
-        moveDistanceY = -5
+        moveDistanceY = -0.5
         // ballAngleDeg = ballAngleDeg * -1
     }
     if (ballLeft <= 0){
-        moveDistanceX = 5
+        moveDistanceX = 0.5
         // ballAngleDeg = ballAngleDeg * -1
     }
     if (ballBottom <= 0){
-        moveDistanceY = 5
+        moveDistanceY = 0.5
         // ballAngleDeg = ballAngleDeg * -1
     }
     var xComponent = Math.cos(ballAngleDeg * Math.PI / 180) * moveDistanceX
@@ -124,9 +124,54 @@ function moveBall(ballElement){
     // if we hit the paddle, we can get different angles
 }
 
+function checkBrickCollisions(ballElement){
+    var ballOffsets = ballElement.getBoundingClientRect();
+    var ballTop = ballOffsets.top;
+    var ballLeft = ballOffsets.left;
+    var ballRight = ballOffsets.right;
+    var ballBottom = ballOffsets.bottom;
+    
+    for (var i=0; i<document.getElementsByClassName("brick").length; i++){
+        if (document.getElementsByClassName("brick")[i].classList.contains("active")){
+            var brickOffsets = document.getElementsByClassName("brick")[i].getBoundingClientRect();
+            var top = brickOffsets.top;
+            var left = brickOffsets.left;
+            var right = brickOffsets.right;
+            var bottom = brickOffsets.bottom;
+
+            if ((ballLeft >= left) && (ballRight <= right) && (ballTop >= top) && (ballBottom <= bottom)){
+                document.getElementsByClassName("brick")[i].classList.remove("active")
+            }
+        }
+    }
+}
+
+function changeDirectionIfCollide(plane){
+    if (plane == "top"){
+        moveDistanceX = -0.5
+    }
+
+    else if (plane == "bottom"){
+        moveDistanceY = -0.5
+    }
+
+    else if (plane == "left"){
+        moveDistanceX = 0.5
+    }
+    
+    else if (plane == "right"){
+        moveDistanceY = 0.5
+    }
+}
+
+function initCheckBallCollisions(){
+    return setInterval(function(){checkBrickCollisions(document.getElementsByClassName("ball")[0])}, 10)
+}
+
 function init(){
     initPlayfield();
     initBall();
+    initCheckBallCollisions();
 }
 
 // globals
