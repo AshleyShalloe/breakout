@@ -100,8 +100,13 @@ function updateBricks(){
 }
 
 function initBall(){
-    var ballHtml = "<div class='ball' style='left: 50%; bottom: 10%;'></div>"
-    document.getElementById("playfieldContainer").innerHTML += ballHtml
+    if (document.getElementsByClassName("ball").length == 0){
+        var ballHtml = "<div class='ball' style='left: 50%; bottom: 10%;'></div>"
+        document.getElementById("playfieldContainer").innerHTML += ballHtml
+    }
+    
+    isLose = false;
+
     return setInterval(() => {
         moveBall(document.getElementsByClassName("ball")[0])
     }, 10);
@@ -125,6 +130,9 @@ function moveBall(ballElement){
     }
     if (ballBottom <= 0){
         moveDistanceY = ballSpeed
+        if (checkLoseCondition(ballElement)){
+            clearInterval(ballInterval);
+        }
         // ballAngleDeg = ballAngleDeg * -1
     }
     var xComponent = Math.cos(ballAngleDeg * Math.PI / 180) * moveDistanceX
@@ -216,27 +224,55 @@ function movePaddle(direction){
     else if ((direction == "right") && (paddlePosition < 90)){
         paddlePosition += 3
     }
-    else{
+    else if (direction == "home"){
         // return to centre
         paddlePosition = 50
     }
     document.getElementById("paddle").style.left = paddlePosition.toString() + "%"
 }
 
-window.onkeydown = function(){
-    if (event.key == "ArrowLeft"){
-        movePaddle("left")
-    }
+function initPaddleKeyboardEvents(){
+    window.onkeydown = function(){
+        if (event.key == "ArrowLeft"){
+            movePaddle("left")
+        }
 
-    else if (event.key == "ArrowRight"){
-        movePaddle("right")
+        else if (event.key == "ArrowRight"){
+            movePaddle("right")
+        }
+
+        if (isLose){
+            if (event.key == " ")
+                ballInterval = initBall()
+        }
     }
+}
+
+function checkLoseCondition(ballElement){
+    var ballOffsets = ballElement.getBoundingClientRect();
+    var ballLeft = ballOffsets.left;
+    var ballRight = ballOffsets.right;
+    var ballBottom = ballOffsets.bottom;
+
+    var paddleOffsets = document.getElementById("paddle").getBoundingClientRect();
+    var paddleLeft = paddleOffsets.left;
+    var paddleRight = paddleOffsets.right;
+    var paddleTop = paddleOffsets.top;
+
+    if (ballBottom > paddleTop){
+        if ((ballLeft <= paddleLeft) || (ballRight >= paddleRight)){
+            isLose = true
+            return true
+        }
+    }
+    return false
 }
 
 function init(){
     initPlayfield();
-    initBall();
+    ballInterval = initBall();
     initCheckBallCollisions();
+    initPaddleKeyboardEvents();
 }
 
 // globals
@@ -244,6 +280,8 @@ var ballAngleDeg = 45
 var ballSpeed = 0.5
 var moveDistanceX = ballSpeed // distance for ball to move in percent
 var moveDistanceY = ballSpeed
+var ballInterval
+var isLose = false
 
 
 init();
