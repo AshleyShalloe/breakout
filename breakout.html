@@ -8,7 +8,7 @@
         width: calc(80vw / 6);
         height: calc(80vw / 6 / 2);
         display: inline-block;
-        margin: 0.5vw;
+        margin: 0vw;
     }
     .brick.active{
         background: cornflowerblue;
@@ -39,6 +39,14 @@
 </body>
 <script>
 'use strict'
+
+function debounce(func, timeout=100){
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+}
 
 var brickArray = [
     [1,1,1,1,1,1],
@@ -94,19 +102,19 @@ function moveBall(ballElement){
     var ballLeft = parseFloat(ballElement.style.left.replace("%", ""))
     var ballBottom = parseFloat(ballElement.style.bottom.replace("%", ""))
     if (ballLeft >= 100){
-        moveDistanceX = -0.5
+        moveDistanceX = -ballSpeed
         // ballAngleDeg = ballAngleDeg * -1
     }
     if (ballBottom >= 100){
-        moveDistanceY = -0.5
+        moveDistanceY = -ballSpeed
         // ballAngleDeg = ballAngleDeg * -1
     }
     if (ballLeft <= 0){
-        moveDistanceX = 0.5
+        moveDistanceX = ballSpeed
         // ballAngleDeg = ballAngleDeg * -1
     }
     if (ballBottom <= 0){
-        moveDistanceY = 0.5
+        moveDistanceY = ballSpeed
         // ballAngleDeg = ballAngleDeg * -1
     }
     var xComponent = Math.cos(ballAngleDeg * Math.PI / 180) * moveDistanceX
@@ -141,31 +149,30 @@ function checkBrickCollisions(ballElement){
             var right = brickOffsets.right;
             var bottom = brickOffsets.bottom;
 
-            if ((ballLeft >= left) && (ballRight <= right) && (ballTop >= top) && (ballBottom <= bottom)){
+            if ((ballRight >= left) && (ballLeft <= right) && (ballBottom >= top) && (ballTop <= bottom)){
                 document.getElementsByClassName("brick")[i].classList.remove("active")
 
                 // figure out which side is closest to the ball
                 // then assume that is the side we hit first
                 // and rebound off it
-                var topDelta = Math.abs(ballTop - top)
-                var leftDelta = Math.abs(ballLeft - left)
-                var rightDelta = Math.abs(ballRight - right)
-                var bottomDelta = Math.abs(ballBottom - bottom)
+                var topDelta = Math.abs(ballBottom - top)
+                var leftDelta = Math.abs(ballRight - left)
+                var rightDelta = Math.abs(ballLeft - right)
+                var bottomDelta = Math.abs(ballTop - bottom)
 
                 var minDelta = Math.min(topDelta, leftDelta, rightDelta, bottomDelta)
-                console.log(topDelta, leftDelta, rightDelta, bottomDelta)
 
                 if (topDelta == minDelta){
-                    changeDirectionIfCollide("top")
+                    changeDirectionIfCollide("bottom")
                 }
-                if (leftDelta == minDelta){
-                    changeDirectionIfCollide("left")
-                }
-                if (rightDelta == minDelta){
+                else if (leftDelta == minDelta){
                     changeDirectionIfCollide("right")
                 }
-                if (bottomDelta == minDelta){
-                    changeDirectionIfCollide("bottom")
+                else if (rightDelta == minDelta){
+                    changeDirectionIfCollide("left")
+                }
+                else if (bottomDelta == minDelta){
+                    changeDirectionIfCollide("top")
                 }
             }
         }
@@ -174,21 +181,21 @@ function checkBrickCollisions(ballElement){
 
 function changeDirectionIfCollide(plane){
     if (plane == "top"){
-        moveDistanceY = 0.5
+        moveDistanceY = -ballSpeed
     }
     else if (plane == "bottom"){
-        moveDistanceY = -0.5
+        moveDistanceY = ballSpeed
     }
     else if (plane == "left"){
-        moveDistanceX = -0.5
+        moveDistanceX = ballSpeed
     }
     else if (plane == "right"){
-        moveDistanceX = 0.5
+        moveDistanceX = -ballSpeed
     }
 }
 
 function initCheckBallCollisions(){
-    return setInterval(function(){checkBrickCollisions(document.getElementsByClassName("ball")[0])}, 10)
+    return setInterval(function(){debounce(checkBrickCollisions(document.getElementsByClassName("ball")[0]), 15)}, 1)
 }
 
 function init(){
@@ -199,8 +206,10 @@ function init(){
 
 // globals
 var ballAngleDeg = 45
-var moveDistanceX = 0.5 // distance for ball to move in percent
-var moveDistanceY = 0.5 
+var ballSpeed = 0.5
+var moveDistanceX = ballSpeed // distance for ball to move in percent
+var moveDistanceY = ballSpeed
+
 
 init();
 
