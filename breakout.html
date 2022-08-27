@@ -30,11 +30,21 @@
         flex-direction: column;
         align-items: center;
     }
+    #paddle{
+        background: forestgreen;
+        border-radius: 1em;
+        width: calc(80vw / 4);
+        height: calc(80vw / 5 / 4);
+        bottom: calc(80vw / 5 / 4);
+        position: fixed;
+        transform: translateX(-50%);
+    }
 </style>
 </head>
 <body>
 <div id="playfieldContainer">
     <div id="brickContainer"></div>
+    <div id="paddle" style="left: 50%;"></div>
 </div>
 </body>
 <script>
@@ -54,8 +64,8 @@ var brickArray = [
     [1,1,1,1,1,1]
 ]
 
-var paddlePosition = 0.5
-var paddleWidth = 0.15
+// var paddlePosition = 0.5
+// var paddleWidth = 0.15
 
 function initPlayfield(){
     var rowHtml = []
@@ -196,6 +206,31 @@ function changeDirectionIfCollide(plane){
 
 function initCheckBallCollisions(){
     return setInterval(function(){debounce(checkBrickCollisions(document.getElementsByClassName("ball")[0]), 15)}, 1)
+}
+
+function movePaddle(direction){
+    var paddlePosition = parseFloat(document.getElementById("paddle").style.left.replace("%", ""))
+    if ((direction == "left") && (paddlePosition > 10)){
+        paddlePosition -= 3
+    }
+    else if ((direction == "right") && (paddlePosition < 90)){
+        paddlePosition += 3
+    }
+    else{
+        // return to centre
+        paddlePosition = 50
+    }
+    document.getElementById("paddle").style.left = paddlePosition.toString() + "%"
+}
+
+window.onkeydown = function(){
+    if (event.key == "ArrowLeft"){
+        movePaddle("left")
+    }
+
+    else if (event.key == "ArrowRight"){
+        movePaddle("right")
+    }
 }
 
 function init(){
